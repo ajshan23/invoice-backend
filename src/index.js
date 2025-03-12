@@ -14,7 +14,7 @@ const PORT = 3005;
 app.use(
   cors({
     origin: "*", // Allow all origins (INSECURE - DO NOT USE IN PRODUCTION)
-    methods: ["GET", "POST", "OPTIONS","DELETE","PUT"], // Or specify the methods you need
+    methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT"], // Or specify the methods you need
     allowedHeaders: ["Content-Type"], // Or specify the headers you need
   })
 );
@@ -25,10 +25,10 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/user", userRouter);
 app.use("/api/invoice", invoiceRouter);
 
-app.use(express.static("/var/www/pdf/pdf-frontend/dist"));
+app.use(express.static("/var/www/glomium/isc/invoice-frontend/dist"));
 
 app.get("*", (req, res) => {
-  res.sendFile("/var/www/pdf/pdf-frontend/dist/index.html");
+  res.sendFile("/var/www/glomium/isc/invoice-frontend/dist/index.html");
 });
 
 connectDB().then(() => {
