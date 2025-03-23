@@ -543,7 +543,7 @@ export const generatePdf = async (req, res) => {
           <tfoot>
             <tr>
               <td colspan="3" class="total">
-                <span>${totalInword} Saudi Riyals, before VAT ${totalPrice}</span>
+                <span>${totalInword} Saudi Riyals, before VAT </span>
               </td>
               <td colspan="2" class="bg-blue">Total Before VAT</td>
               <td><span style="font-weight: 400;">${totalPrice}</span></td>
@@ -1200,7 +1200,7 @@ export const generatePdfById = async (req, res) => {
               <tfoot>
                 <tr>
                   <td colspan="3" class="total">
-                    <span>${totalInword} Saudi Riyals, before VAT ${totalPrice}</span>
+                    <span>${totalInword} Saudi Riyals, before VAT </span>
                   </td>
                   <td colspan="2" class="bg-blue">Total Before VAT</td>
                   <td><span style="font-weight: 400;">${totalPrice}</span></td>
