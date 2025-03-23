@@ -374,47 +374,52 @@ export const generatePdf = async (req, res) => {
         }
 
        .bottom_div {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 20px;
-          border-top: 1px solid rgba(86, 39, 119, 0.6); /* Thin border with reduced opacity */
-          padding-top: 8px;
-          position: relative;
-        }
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  border-top: 1px solid rgba(86, 39, 119, 0.6);
+  padding-top: 8px;
+  position: relative;
+}
 
-        .bottom_div div {
-            width: 50%;
-            position: relative; /* Required for alignment */
-        }
+.bottom_div div {
+  width: 49.5%;
+  position: relative;
+}
 
-        .bottom_div div p {
-            font-size: 9px;
-            color: black;
-            margin: 0;
-        }
+.bottom_div div p {
+  font-size: 10px;
+  color: black;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  display: block;
+  word-wrap: break-word;
+}
 
-          /* Add the vertical line */
-         .bottom_div::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 8px;
-            bottom: 0;
-            width: 1px;
-            background-color: rgba(86, 39, 119, 0.6); /* Thin line with reduced opacity */
-            transform: translateX(-50%);
-          }
+.bottom_div div:first-child {
+  text-align: left;
+  padding-right: 0;
+}
 
-          /* Align the first div's content to the right */
-          .bottom_div div:first-child {
-              text-align: left;
-              padding-right: 10px; /* Add some spacing */
-          }
-
-/* Align the second div's content to the left */
 .bottom_div div:last-child {
-    text-align: left;
-    padding-left: 10px; /* Add some spacing */
+  text-align: right;
+  padding-left: 0;
+  direction: rtl;
+  font-family: "Cairo", sans-serif;
+}
+
+.bottom_div::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(86, 39, 119, 0.6);
+  transform: translateX(-50%);
+}
+dding-left: 10px; /* Add some spacing */
 }
 
         /* Centering only the .cent class */
@@ -586,22 +591,15 @@ export const generatePdf = async (req, res) => {
             </div>
           </div>
           <div class="bottom_div">
-              <div>
-                  <p>
-                      Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252
-                  </p>
-                  <p>
-                      Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769
-                  </p>
-              </div>
-              <div>
-                  <p>
-                      المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ -
-                      الـــرمـــز الــبــريــدي ١٣٢٥٢
-                  </p>
-                  <p>هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩٥٥١ +٩٦٦ - سجل تجاري: ١</p>
-              </div>
-          </div>
+  <div>
+    <p class="english-first">Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252</p>
+    <p class="english-second">Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769</p>
+  </div>
+  <div>
+    <p class="arabic-first">المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ - الـــرمـــز الــبــريــدي ١٣٢٥٢</p>
+    <p class="arabic-second">هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩ٵ٥١ +٩٦٦ - سجل تجاري: ١</p>
+  </div>
+</div>
         </div>
       </div>
     </body>
@@ -1044,41 +1042,53 @@ export const generatePdfById = async (req, res) => {
             .seal_box img {
               width: 100px;
             }
-            .bottom_div {
-              display: flex;
-              justify-content: space-between;
-              margin-top: 20px;
-              border-top: 1px solid rgba(86, 39, 119, 0.6);
-              padding-top: 8px;
-              position: relative;
-            }
-            .bottom_div div {
-              width: 50%;
-              position: relative;
-            }
-            .bottom_div div p {
-              font-size: 9px;
-              color: black;
-              margin: 0;
-            }
-            .bottom_div::before {
-              content: '';
-              position: absolute;
-              left: 50%;
-              top: 8px;
-              bottom: 0;
-              width: 1px;
-              background-color: rgba(86, 39, 119, 0.6);
-              transform: translateX(-50%);
-            }
-            .bottom_div div:first-child {
-              text-align: left;
-              padding-right: 10px;
-            }
-            .bottom_div div:last-child {
-              text-align: left;
-              padding-left: 10px;
-            }
+           .bottom_div {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  border-top: 1px solid rgba(86, 39, 119, 0.6);
+  padding-top: 8px;
+  position: relative;
+}
+
+.bottom_div div {
+  width: 49.5%;
+  position: relative;
+}
+
+.bottom_div div p {
+  font-size: 10px;
+  color: black;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  display: block;
+  word-wrap: break-word;
+}
+
+.bottom_div div:first-child {
+  text-align: left;
+  padding-right: 0;
+}
+
+.bottom_div div:last-child {
+  text-align: right;
+  padding-left: 0;
+  direction: rtl;
+  font-family: "Cairo", sans-serif;
+}
+
+.bottom_div::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(86, 39, 119, 0.6);
+  transform: translateX(-50%);
+}
+
             .cent {
               text-align: center;
               vertical-align: middle;
@@ -1241,25 +1251,19 @@ export const generatePdfById = async (req, res) => {
                   </div>
                 </div>
               </div>
-              <div class="bottom_div">
-                <div>
-                  <p>
-                    Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252
-                  </p>
-                  <p>
-                    Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ -
-                    الـــرمـــز الــبــريــدي ١٣٢٥٢
-                  </p>
-                  <p>هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩٥٥١ +٩٦٦ - سجل تجاري: ١</p>
-                </div>
-              </div>
+             <div class="bottom_div">
+  <div>
+    <p class="english-first">Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252</p>
+    <p class="english-second">Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769</p>
+  </div>
+  <div>
+    <p class="arabic-first">المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ - الـــرمـــز الــبــريــدي ١٣٢٥٢</p>
+    <p class="arabic-second">هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩ٵ٥١ +٩٦٦ - سجل تجاري: ١</p>
+  </div>
+</div>
             </div>
           </div>
+          
         </body>
       </html>
     `;
