@@ -388,7 +388,7 @@ export const generatePdf = async (req, res) => {
         }
 
         .bottom_div div p {
-            font-size: 10px;
+            font-size: 9px;
             color: black;
             margin: 0;
         }
@@ -1057,7 +1057,7 @@ export const generatePdfById = async (req, res) => {
               position: relative;
             }
             .bottom_div div p {
-              font-size: 10px;
+              font-size: 9px;
               color: black;
               margin: 0;
             }
