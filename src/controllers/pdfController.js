@@ -161,11 +161,19 @@ export const generatePdf = async (req, res) => {
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
       <style>
         /* Your existing CSS styles */
-        body {
-          font-family: 'Poppins', sans-serif;
-          background: #f9f9f9;
-        }
-
+       html {
+              margin: 0;
+              padding: 0;
+              background-color: #e0e0e0; /* For debugging */
+              height: auto; /* Will override dynamically */
+            }
+            body {
+              font-family: 'Poppins', sans-serif;
+              background: #f9f9f9;
+              margin: 0;
+              padding: 0;
+              height: auto;
+            }
         .quotation-container {
           background: #fff;
           padding: 20px;
@@ -372,54 +380,34 @@ export const generatePdf = async (req, res) => {
         .seal_box img {
           width: 100px;
         }
-
-       .bottom_div {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  border-top: 1px solid rgba(86, 39, 119, 0.6);
+.bottom_div {
   padding-top: 8px;
-  position: relative;
-}
-
-.bottom_div div {
-  width: 49.5%;
-  position: relative;
-}
-
-.bottom_div div p {
-  font-size: 10px;
-  color: black;
   margin: 0;
-  padding: 0;
-  line-height: 1;
-  display: block;
-  word-wrap: break-word;
-}
-
-.bottom_div div:first-child {
-  text-align: left;
-  padding-right: 0;
-}
-
-.bottom_div div:last-child {
-  text-align: right;
-  padding-left: 0;
-  direction: rtl;
-  font-family: "Cairo", sans-serif;
-}
-
-.bottom_div::before {
-  content: '';
-  position: absolute;
+  width: 104vw; /* Full viewport width */
+  position: relative;
   left: 50%;
-  top: 8px;
-  bottom: 0;
-  width: 1px;
-  background-color: rgba(86, 39, 119, 0.6);
-  transform: translateX(-50%);
+  transform: translateX(-50%); /* Centers the container */
 }
-dding-left: 10px; /* Add some spacing */
+
+.bottom_div img {
+  width: 104vw; /* Full viewport width */
+  height: auto;
+  display: block;
+}
+                /* Updated styles for equal column widths */
+.quotation-table th:nth-child(4),
+.quotation-table td:nth-child(4),
+.quotation-table th:nth-child(5),
+.quotation-table td:nth-child(5),
+.quotation-table th:nth-child(6),
+.quotation-table td:nth-child(6) {
+  width: 80px; /* Set equal width for Quantity, Unit Price, and Total Price */
+  text-align: center;
+}
+  .riyal-icon {
+  width: 10px !important;
+  height: 12px !important;
+  vertical-align: middle;
 }
 
         /* Centering only the .cent class */
@@ -546,24 +534,34 @@ dding-left: 10px; /* Add some spacing */
               .join("")}
           </tbody>
           <tfoot>
-            <tr>
-              <td colspan="3" class="total">
-                <span>${totalInword} Saudi Riyals, before VAT </span>
-              </td>
-              <td colspan="2" class="bg-blue">Total Before VAT</td>
-              <td><span style="font-weight: 400;">${totalPrice}</span></td>
-            </tr>
-            <tr>
-              <td colspan="3" class="total"><span>+15% VAT on total amount</span></td>
-              <td colspan="2" class="bg-blue" style="background-color: #0055a4 !important;">15% VAT</td>
-              <td><span style="font-weight: 400;">${VATAmount}</span></td>
-            </tr>
-            <tr>
-              <td colspan="3" class="total"><span>${finalAmountInword} SR, (15% VAT Inclusive)</span></td>
-              <td colspan="2" class="bg-blue bg-blue-last">Total With VAT(15%)</td>
-              <td><span style="font-weight: 400;">${finalAmount}</span></td>
-            </tr>
-          </tfoot>
+                <tr>
+                  <td colspan="3" class="total">
+                     <span>${totalInword} <img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> , before VAT </span>
+                  </td>
+                  <td colspan="2" class="bg-blue">Total Before VAT</td>
+                   <td style="text-align: center; white-space: nowrap; ">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${totalPrice}</span>
+</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="total"><span>+15% VAT on total amount</span></td>
+                  <td colspan="2" class="bg-blue" style="background-color: #0055a4 !important;">15% VAT</td>
+                  <td style="text-align: center; white-space: nowrap;">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${VATAmount}</span>
+</td>
+                 
+                </tr>
+                <tr>
+                  <td colspan="3" class="total"><span>${finalAmountInword} <img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> , (15% VAT Inclusive)</span></td>
+                  <td colspan="2" class="bg-blue bg-blue-last">Total With VAT(15%)</td>
+              <td style="text-align: center; white-space: nowrap; ">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${finalAmount}</span>
+</td>
+                </tr>
+              </tfoot>
         </table>
         <div class="footer">
           <div class="seal_flex">
@@ -591,14 +589,7 @@ dding-left: 10px; /* Add some spacing */
             </div>
           </div>
           <div class="bottom_div">
-  <div>
-    <p class="english-first">Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252</p>
-    <p class="english-second">Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769</p>
-  </div>
-  <div>
-    <p class="arabic-first">المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ - الـــرمـــز الــبــريــدي ١٣٢٥٢</p>
-    <p class="arabic-second">هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩ٵ٥١ +٩٦٦ - سجل تجاري: ١</p>
-  </div>
+  <img src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/footer.svg" alt="Footer Image" style="width: 100%; height: auto;">
 </div>
         </div>
       </div>
@@ -608,36 +599,75 @@ dding-left: 10px; /* Add some spacing */
 
     // Launch Puppeteer
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      defaultViewport: null,
     });
+
     const page = await browser.newPage();
 
-    // Set viewport to match your design
-    await page.setViewport({ width: 1200, height: 800 });
+    // Set initial viewport
+    await page.setViewport({ width: 800, height: 1000 });
 
-    // Set the HTML content
+    // Load content with waiting
     await page.setContent(htmlContent, {
-      waitUntil: "networkidle0",
-      timeout: 60000,
+      waitUntil: ["networkidle0", "domcontentloaded", "load"],
     });
 
-    // Generate PDF with printBackground enabled
+    // Wait for everything to render
+    await Promise.all([
+      page.waitForSelector(".quotation-container", { visible: true }),
+      page.evaluate(() => document.fonts.ready),
+    ]);
+
+    // Get PRECISE height with 10px compensation
+    const preciseHeight = await page.evaluate(() => {
+      const container = document.querySelector(".quotation-container");
+      if (!container) return 0;
+
+      // Get the actual bottom position of the last element
+      const lastElement = container.lastElementChild;
+      const containerTop = container.getBoundingClientRect().top;
+      const lastElementBottom = lastElement.getBoundingClientRect().bottom;
+
+      // Calculate visible height and apply 10px correction
+      const rawHeight = lastElementBottom - containerTop;
+      return Math.ceil(rawHeight) - 5; // Deduct the persistent 10px gap
+    });
+
+    // Generate PDF with corrected height
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      width: "786px",
+      height: `${preciseHeight}px`,
       printBackground: true,
+      margin: {
+        top: "0px",
+        right: "0px",
+        bottom: "0px",
+        left: "0px",
+      },
+      preferCSSPageSize: false,
+      scale: 1,
     });
 
     await browser.close();
 
-    // Convert the PDF buffer to a base64 string
-    const pdfBase64 = encode(pdfBuffer);
-
-    // Send the response
-    res.json({ success: true, pdf: pdfBase64 });
+    res.json({
+      success: true,
+      pdf: encode(pdfBuffer),
+      debug: {
+        calculatedHeight: preciseHeight,
+        compensation: "10px subtracted",
+      },
+    });
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Final PDF Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "PDF generation failed",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
@@ -871,9 +901,18 @@ export const generatePdfById = async (req, res) => {
           <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
           <style>
             /* Your existing CSS styles (unchanged) */
+          html {
+              margin: 0;
+              padding: 0;
+              background-color: #e0e0e0; /* For debugging */
+              height: auto; /* Will override dynamically */
+            }
             body {
               font-family: 'Poppins', sans-serif;
               background: #f9f9f9;
+              margin: 0;
+              padding: 0;
+              height: auto;
             }
             .quotation-container {
               background: #fff;
@@ -1042,53 +1081,20 @@ export const generatePdfById = async (req, res) => {
             .seal_box img {
               width: 100px;
             }
-           .bottom_div {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  border-top: 1px solid rgba(86, 39, 119, 0.6);
+.bottom_div {
   padding-top: 8px;
-  position: relative;
-}
-
-.bottom_div div {
-  width: 49.5%;
-  position: relative;
-}
-
-.bottom_div div p {
-  font-size: 10px;
-  color: black;
   margin: 0;
-  padding: 0;
-  line-height: 1;
-  display: block;
-  word-wrap: break-word;
-}
-
-.bottom_div div:first-child {
-  text-align: left;
-  padding-right: 0;
-}
-
-.bottom_div div:last-child {
-  text-align: right;
-  padding-left: 0;
-  direction: rtl;
-  font-family: "Cairo", sans-serif;
-}
-
-.bottom_div::before {
-  content: '';
-  position: absolute;
+  width: 104vw; /* Full viewport width */
+  position: relative;
   left: 50%;
-  top: 8px;
-  bottom: 0;
-  width: 1px;
-  background-color: rgba(86, 39, 119, 0.6);
-  transform: translateX(-50%);
+  transform: translateX(-50%); /* Centers the container */
 }
 
+.bottom_div img {
+  width: 104vw; /* Full viewport width */
+  height: auto;
+  display: block;
+}
             .cent {
               text-align: center;
               vertical-align: middle;
@@ -1112,6 +1118,21 @@ export const generatePdfById = async (req, res) => {
               display: block;
               margin: 0 auto;
             }
+              /* Updated styles for equal column widths */
+.quotation-table th:nth-child(4),
+.quotation-table td:nth-child(4),
+.quotation-table th:nth-child(5),
+.quotation-table td:nth-child(5),
+.quotation-table th:nth-child(6),
+.quotation-table td:nth-child(6) {
+  width: 80px; /* Set equal width for Quantity, Unit Price, and Total Price */
+  text-align: center;
+}
+.riyal-icon {
+  width: 10px !important;
+  height: 12px !important;
+  vertical-align: middle;
+}
           </style>
         </head>
         <body>
@@ -1168,8 +1189,12 @@ export const generatePdfById = async (req, res) => {
                           }
                         </td>
                         <td class="cent">${item.quantity} pcs</td>
-                        <td class="cent">${item.price}</td>
-                        <td class="cent">${item.quantity * item.price}</td>
+                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                          item.price
+                        }</td>
+                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                          item.quantity * item.price
+                        }</td>
                       </tr>
                       ${item.subItems
                         .map(
@@ -1180,8 +1205,10 @@ export const generatePdfById = async (req, res) => {
                             subItem.name
                           }</td>
                             <td class="cent">${subItem.quantity} pcs</td>
-                            <td class="cent">${subItem.price}</td>
-                            <td class="cent">${
+                            <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                              subItem.price
+                            }</td>
+                            <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
                               subItem.quantity * subItem.price
                             }</td>
                           </tr>
@@ -1210,20 +1237,30 @@ export const generatePdfById = async (req, res) => {
               <tfoot>
                 <tr>
                   <td colspan="3" class="total">
-                    <span>${totalInword} Saudi Riyals, before VAT </span>
+                     <span>${totalInword} <img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> , before VAT </span>
                   </td>
                   <td colspan="2" class="bg-blue">Total Before VAT</td>
-                  <td><span style="font-weight: 400;">${totalPrice}</span></td>
+                   <td style="text-align: center; white-space: nowrap; ">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${totalPrice}</span>
+</td>
                 </tr>
                 <tr>
                   <td colspan="3" class="total"><span>+15% VAT on total amount</span></td>
                   <td colspan="2" class="bg-blue" style="background-color: #0055a4 !important;">15% VAT</td>
-                  <td><span style="font-weight: 400;">${VATAmount}</span></td>
+                  <td style="text-align: center; white-space: nowrap;">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${VATAmount}</span>
+</td>
+                 
                 </tr>
                 <tr>
-                  <td colspan="3" class="total"><span>${finalAmountInword} SR, (15% VAT Inclusive)</span></td>
+                  <td colspan="3" class="total"><span>${finalAmountInword} <img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> , (15% VAT Inclusive)</span></td>
                   <td colspan="2" class="bg-blue bg-blue-last">Total With VAT(15%)</td>
-                  <td><span style="font-weight: 400;">${finalAmount}</span></td>
+              <td style="text-align: center; white-space: nowrap; ">
+  <img class="riyal-icon" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" style="display: inline; vertical-align: middle; " />
+  <span style="font-weight: 400; margin-left: 3px; display: inline; vertical-align: middle; ">${finalAmount}</span>
+</td>
                 </tr>
               </tfoot>
             </table>
@@ -1251,54 +1288,83 @@ export const generatePdfById = async (req, res) => {
                   </div>
                 </div>
               </div>
-             <div class="bottom_div">
-  <div>
-    <p class="english-first">Kingdom of Saudi Arabia - Riyadh - P.O.Box 8199 - Post Code: 13252</p>
-    <p class="english-second">Tel.: +966 11 2098112 - Mobile: +966 553559551 - C.R.: 1010588769</p>
-  </div>
-  <div>
-    <p class="arabic-first">المـمـلـكـة الـعـربـيـة الـسـعـوديـة - الـــريـــاض - ص.ب ٨١٩٩ - الـــرمـــز الــبــريــدي ١٣٢٥٢</p>
-    <p class="arabic-second">هاتف: ٢٠٩٨١١٢ ١١ +٩٦٦ - جوال: ٥٥٣٥٥٩ٵ٥١ +٩٦٦ - سجل تجاري: ١</p>
-  </div>
+            <div class="bottom_div">
+  <img src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/footer.svg" alt="Footer Image" style="width: 100%; height: auto;">
 </div>
-            </div>
           </div>
           
         </body>
       </html>
     `;
-
-    // Launch Puppeteer (same as your original code)
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      defaultViewport: null,
     });
+
     const page = await browser.newPage();
 
-    // Set viewport to match your design
-    await page.setViewport({ width: 1200, height: 800 });
+    // Set initial viewport
+    await page.setViewport({ width: 800, height: 1000 });
 
-    // Set the HTML content
+    // Load content with waiting
     await page.setContent(htmlContent, {
-      waitUntil: "networkidle0",
-      timeout: 60000,
+      waitUntil: ["networkidle0", "domcontentloaded", "load"],
     });
 
-    // Generate PDF with printBackground enabled
+    // Wait for everything to render
+    await Promise.all([
+      page.waitForSelector(".quotation-container", { visible: true }),
+      page.evaluate(() => document.fonts.ready),
+    ]);
+
+    // Get PRECISE height with 10px compensation
+    const preciseHeight = await page.evaluate(() => {
+      const container = document.querySelector(".quotation-container");
+      if (!container) return 0;
+
+      // Get the actual bottom position of the last element
+      const lastElement = container.lastElementChild;
+      const containerTop = container.getBoundingClientRect().top;
+      const lastElementBottom = lastElement.getBoundingClientRect().bottom;
+
+      // Calculate visible height and apply 10px correction
+      const rawHeight = lastElementBottom - containerTop;
+      return Math.ceil(rawHeight) - 5; // Deduct the persistent 10px gap
+    });
+
+    // Generate PDF with corrected height
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      width: "786px",
+      height: `${preciseHeight}px`,
       printBackground: true,
+      margin: {
+        top: "0px",
+        right: "0px",
+        bottom: "0px",
+        left: "0px",
+      },
+      preferCSSPageSize: false,
+      scale: 1,
     });
 
     await browser.close();
 
-    // Convert the PDF buffer to a base64 string
-    const pdfBase64 = encode(pdfBuffer);
-
-    // Send the response
-    res.json({ success: true, pdf: pdfBase64 });
+    res.json({
+      success: true,
+      pdf: encode(pdfBuffer),
+      debug: {
+        calculatedHeight: preciseHeight,
+        compensation: "10px subtracted",
+      },
+    });
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Final PDF Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "PDF generation failed",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
