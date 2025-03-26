@@ -496,8 +496,12 @@ export const generatePdf = async (req, res) => {
                         }
                       </td>
                       <td class="cent">${item.quantity} pcs</td>
-                      <td class="cent">${item.price}</td>
-                      <td class="cent">${item.quantity * item.price}</td>
+                       <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                         item.price
+                       }</td>
+                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                          item.quantity * item.price
+                        }</td>
                     </tr>
                     ${item.subItems
                       .map(
@@ -506,10 +510,12 @@ export const generatePdf = async (req, res) => {
                           <td></td>
                           <td>${alpha[subIndex]}.&nbsp;${subItem.name}</td>
                           <td class="cent">${subItem.quantity} pcs</td>
-                          <td class="cent">${subItem.price}</td>
-                          <td class="cent">${
-                            subItem.quantity * subItem.price
+                          <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                            subItem.price
                           }</td>
+                            <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                              subItem.quantity * subItem.price
+                            }</td>
                         </tr>
                       `
                       )
