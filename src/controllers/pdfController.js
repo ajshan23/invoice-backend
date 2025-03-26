@@ -480,65 +480,95 @@ export const generatePdf = async (req, res) => {
               <th><span class="arabic">قیمة الإجمالي</span><br />TOTAL PRICE</th>
             </tr>
           </thead>
-          <tbody>
-            ${items
-              .map((item, index) => {
-                const rowCount = 1 + item.subItems.length + 2; // Main item + sub-items + 2 extra rows
-                return `
-                    <tr>
-                      <td class="cent">0${index + 1}</td>
-                      <td>${item.name}</td>
-                      <td rowspan="${rowCount}" style="vertical-align: top;">
-                        ${
-                          item.image
-                            ? `<img src="${item.image}" alt="Item Image" />`
-                            : ""
-                        }
-                      </td>
-                      <td class="cent">${item.quantity} pcs</td>
-                       <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                         item.price
-                       }</td>
-                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                          item.quantity * item.price
-                        }</td>
-                    </tr>
-                    ${item.subItems
-                      .map(
-                        (subItem, subIndex) => `
+         <tbody>
+                ${
+                  // Generate rows for items and sub-items
+                  items
+                    .map((item, index) => {
+                      const rowCount = 1 + item.subItems.length + 2; // Main item + sub-items + 2 extra rows
+                      return `
                         <tr>
-                          <td></td>
-                          <td>${alpha[subIndex]}.&nbsp;${subItem.name}</td>
-                          <td class="cent">${subItem.quantity} pcs</td>
+                          <td class="cent">0${index + 1}</td>
+                          <td>${item.name}</td>
+                          <td rowspan="${rowCount}" style="vertical-align: top;">
+                            ${
+                              item.image
+                                ? `<img src="${item.image}" alt="Item Image" />`
+                                : ""
+                            }
+                          </td>
+                          <td class="cent">${item.quantity} pcs</td>
                           <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                            subItem.price
+                            item.price
                           }</td>
-                            <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                              subItem.quantity * subItem.price
-                            }</td>
+                          <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                            item.quantity * item.price
+                          }</td>
                         </tr>
-                      `
-                      )
-                      .join("")}
-                    <!-- Add two extra rows after each main item -->
-                    <tr>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                    </tr>
-                    <tr>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                      <td class="p-15"></td>
-                    </tr>
-                  `;
-              })
-              .join("")}
-          </tbody>
+                        ${item.subItems
+                          .map(
+                            (subItem, subIndex) => `
+                            <tr>
+                              <td></td>
+                              <td>${String.fromCharCode(97 + subIndex)}. ${
+                              subItem.name
+                            }</td>
+                              <td class="cent">${subItem.quantity} pcs</td>
+                              <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                                subItem.price
+                              }</td>
+                              <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                                subItem.quantity * subItem.price
+                              }</td>
+                            </tr>
+                          `
+                          )
+                          .join("")}
+                        <!-- Add two extra rows after each main item -->
+                        <tr>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                        </tr>
+                        <tr>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                        </tr>
+                      `;
+                    })
+                    .join("")
+                }
+                ${
+                  // Calculate total rows and add extra rows if needed
+                  (() => {
+                    // Count total rows: 1 per main item + sub-items + 2 extra rows per main item
+                    const totalRows = items.reduce(
+                      (sum, item) => sum + 1 + item.subItems.length + 2,
+                      0
+                    );
+                    const rowsNeeded = Math.max(15 - totalRows, 0); // Minimum 15 rows
+                    let extraRows = "";
+                    for (let i = 0; i < rowsNeeded; i++) {
+                      extraRows += `
+                        <tr>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                          <td class="p-15"></td>
+                        </tr>
+                      `;
+                    }
+                    return extraRows;
+                  })()
+                }
+              </tbody>
           <tfoot>
                 <tr>
                   <td colspan="3" class="total">
@@ -1180,36 +1210,38 @@ export const generatePdfById = async (req, res) => {
                 </tr>
               </thead>
               <tbody>
-                ${items
-                  .map((item, index) => {
-                    const rowCount = 1 + item.subItems.length + 2; // Main item + sub-items + 2 extra rows
-                    return `
-                      <tr>
-                        <td class="cent">0${index + 1}</td>
-                        <td>${item.name}</td>
-                        <td rowspan="${rowCount}" style="vertical-align: top;">
-                          ${
-                            item.image
-                              ? `<img src="${item.image}" alt="Item Image" />`
-                              : ""
-                          }
-                        </td>
-                        <td class="cent">${item.quantity} pcs</td>
-                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                          item.price
-                        }</td>
-                        <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
-                          item.quantity * item.price
-                        }</td>
-                      </tr>
-                      ${item.subItems
-                        .map(
-                          (subItem, subIndex) => `
+            ${
+              // Generate rows for items and sub-items
+              items
+                .map((item, index) => {
+                  const rowCount = 1 + item.subItems.length + 2; // Main item + sub-items + 2 extra rows
+                  return `
+                    <tr>
+                      <td class="cent">0${index + 1}</td>
+                      <td>${item.name}</td>
+                      <td rowspan="${rowCount}" style="vertical-align: top;">
+                        ${
+                          item.image
+                            ? `<img src="${item.image}" alt="Item Image" />`
+                            : ""
+                        }
+                      </td>
+                      <td class="cent">${item.quantity} pcs</td>
+                      <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                        item.price
+                      }</td>
+                      <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
+                        item.quantity * item.price
+                      }</td>
+                    </tr>
+                    ${item.subItems
+                      .map(
+                        (subItem, subIndex) => `
                           <tr>
                             <td></td>
                             <td>${String.fromCharCode(97 + subIndex)}. ${
-                            subItem.name
-                          }</td>
+                          subItem.name
+                        }</td>
                             <td class="cent">${subItem.quantity} pcs</td>
                             <td class="cent"><img width="10px" height="12px" src="https://krishnadas-test-1.s3.ap-south-1.amazonaws.com/riyal_icon.png" /> ${
                               subItem.price
@@ -1219,27 +1251,53 @@ export const generatePdfById = async (req, res) => {
                             }</td>
                           </tr>
                         `
-                        )
-                        .join("")}
-                      <!-- Add two extra rows after each main item -->
-                      <tr>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                      </tr>
-                      <tr>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                        <td class="p-15"></td>
-                      </tr>
-                    `;
-                  })
-                  .join("")}
-              </tbody>
+                      )
+                      .join("")}
+                    <!-- Add two extra rows after each main item -->
+                    <tr>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                    </tr>
+                    <tr>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                    </tr>
+                  `;
+                })
+                .join("")
+            }
+            ${
+              // Calculate total rows and add extra rows if needed
+              (() => {
+                // Count total rows: 1 per main item + sub-items + 2 extra rows per main item
+                const totalRows = items.reduce(
+                  (sum, item) => sum + 1 + item.subItems.length + 2,
+                  0
+                );
+                const rowsNeeded = Math.max(15 - totalRows, 0); // Minimum 15 rows
+                let extraRows = "";
+                for (let i = 0; i < rowsNeeded; i++) {
+                  extraRows += `
+                    <tr>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                      <td class="p-15"></td>
+                    </tr>
+                  `;
+                }
+                return extraRows;
+              })()
+            }
+          </tbody>
               <tfoot>
                 <tr>
                   <td colspan="3" class="total">
