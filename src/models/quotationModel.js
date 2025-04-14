@@ -14,25 +14,30 @@ const itemSchema = new mongoose.Schema({
   subItems: [subItemSchema],
 });
 
-const invoiceSchema = new mongoose.Schema({
+const quotationSchema = new mongoose.Schema({
   companyName: { type: String, required: true },
   date: { type: Date, required: true },
-  invoiceNumber: { type: String, required: true, unique: true },
+  quotationNumber: { type: String, required: true, unique: true }, // Changed from invoiceNumber
   items: [itemSchema],
   terms: [{ type: String }],
   totalPrice: { type: Number, required: true },
   VATAmount: { type: Number, required: true },
   finalAmount: { type: Number, required: true },
+  preparedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 // Update the `updatedAt` field before saving
-invoiceSchema.pre("save", function (next) {
+quotationSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-const Invoice = mongoose.model("Invoice", invoiceSchema);
+const Quotation = mongoose.model("Quotation", quotationSchema); // Changed from Invoice
 
-export default Invoice;
+export default Quotation;

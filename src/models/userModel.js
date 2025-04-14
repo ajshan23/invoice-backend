@@ -1,33 +1,55 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Please add a name"],
+  },
   email: {
     type: String,
-    required: true,
+    required: [true, "Please add an email"],
     unique: true,
     trim: true,
-    lowercase: true,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please add a valid email",
+    ],
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Please add a password"],
+    minlength: 6,
+    select: false,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "staff"],
+    default: "staff",
+  },
+  signature: {
+    type: String, // Store base64-encoded image
+    default: null,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-// Hash the password before saving the user
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password') || this.isNew) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+// Encrypt password before saving
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
   }
-  next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password for login
-userSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+// Method to compare entered password with hashed password
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

@@ -1,6 +1,7 @@
 import { encode } from "base64-arraybuffer";
 import puppeteer from "puppeteer";
-import Invoice from "../models/invoiceModel.js";
+import Quotation from "../models/quotationModel.js";
+import User from "../models/userModel.js";
 
 function numberToWords(num) {
   const belowTwenty = [
@@ -105,7 +106,7 @@ const alpha = [
 ];
 
 export const generatePdf = async (req, res) => {
-  const { companyName, date, items, invoiceNumber, terms } = req.body;
+  const { companyName, date, items, quotationNumber, terms } = req.body;
   const formattedDate = new Date(date)
     .toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -113,6 +114,15 @@ export const generatePdf = async (req, res) => {
       year: "numeric",
     })
     .replace(/\//g, " / ");
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: "User not found",
+    });
+  }
+
   // Calculate total price
   const totalPrice = items.reduce((total, item) => {
     let itemTotal = item.quantity * item.price;
@@ -130,15 +140,16 @@ export const generatePdf = async (req, res) => {
   try {
     // Dynamically generate the HTML content using template literals
 
-    const newInvoice = new Invoice({
+    const newInvoice = new Quotation({
       companyName,
       date,
       items,
-      invoiceNumber,
+      quotationNumber,
       terms,
       totalPrice,
       VATAmount,
       finalAmount,
+      preparedBy: req.user.id,
     });
 
     await newInvoice.save();
@@ -458,7 +469,7 @@ export const generatePdf = async (req, res) => {
         </div>
         <p class="blue_font italic">
           <strong>No. </strong>
-          <span style="color: red; font-style: normal;letter-spacing:3px; font-weight:500;font-size:14px;">&nbsp; ${invoiceNumber}</span>
+          <span style="color: red; font-style: normal;letter-spacing:3px; font-weight:500;font-size:14px;">&nbsp; ${quotationNumber}</span>
         </p>
         <p class=" pt-10" style="margin-bottom: 0">
           <span class="blue_font">Date:</span> <span style="color: black font-weight:400;font-size:14px"><i> ${formattedDate}</i></span>
@@ -709,45 +720,33 @@ export const generatePdf = async (req, res) => {
 
 export const getAllInvoices = async (req, res) => {
   try {
-    // Extract query parameters
     const { page = 1, limit = 10, search = "" } = req.query;
 
-    // Convert page and limit to numbers
-    const pageNumber = parseInt(page, 10);
-    const limitNumber = parseInt(limit, 10);
-
-    // Calculate the number of documents to skip
-    const skip = (pageNumber - 1) * limitNumber;
-
-    // Define the search query
-    const searchQuery = {
+    // Build query with access control
+    const query = {
       $or: [
-        { companyName: { $regex: search, $options: "i" } }, // Case-insensitive search on companyName
-        { invoiceNumber: { $regex: search, $options: "i" } }, // Case-insensitive search on invoiceNumber
+        { companyName: { $regex: search, $options: "i" } },
+        { quotationNumber: { $regex: search, $options: "i" } },
       ],
+      ...(req.user.role !== "admin" && { preparedBy: req.user._id }), // Changed to preparedBy
     };
 
-    // Fetch invoices with pagination and search
-    const invoices = await Invoice.find(searchQuery)
-      .skip(skip)
-      .limit(limitNumber)
-      .exec();
+    const invoices = await Quotation.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate("preparedBy", "name email"); // Only populate preparedBy
 
-    // Get the total count of matching invoices (for pagination)
-    const totalInvoices = await Invoice.countDocuments(searchQuery);
+    const totalInvoices = await Quotation.countDocuments(query);
 
-    // Calculate total pages
-    const totalPages = Math.ceil(totalInvoices / limitNumber);
-
-    // Send the response
     res.status(200).json({
       success: true,
       data: invoices,
       pagination: {
-        currentPage: pageNumber,
-        totalPages,
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalInvoices / limit),
         totalInvoices,
-        limit: limitNumber,
+        limit: Number(limit),
       },
     });
   } catch (error) {
@@ -755,127 +754,129 @@ export const getAllInvoices = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-
 export const deleteInvoice = async (req, res) => {
-  console.log("ethy");
-
   try {
-    const { id } = req.params;
-    const deletedInvoice = await Invoice.findByIdAndDelete(id);
+    const quotation = await Quotation.findById(req.params.id);
 
-    if (!deletedInvoice) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Invoice not found" });
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        error: "Quotation not found",
+      });
     }
 
-    res.status(200).json({ success: true, data: deletedInvoice });
+    // Check authorization - admin or creator (using preparedBy)
+    if (
+      req.user.role !== "admin" &&
+      quotation.preparedBy.toString() !== req.user._id.toString() // Changed to preparedBy
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: "Not authorized to delete this quotation",
+      });
+    }
+
+    await quotation.deleteOne();
+    res.status(200).json({ success: true, data: {} });
   } catch (error) {
-    console.error("Error deleting invoice:", error);
+    console.error("Error deleting Quotation:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
 export const updateInvoice = async (req, res) => {
   try {
     const { id } = req.params;
-    const { companyName, date, items, invoiceNumber, terms } = req.body;
+    const { companyName, date, items, quotationNumber, terms } = req.body;
 
-    // Validate and convert the incoming date to a Date object
-    let parsedDate;
-    try {
-      parsedDate = new Date(date);
-      if (isNaN(parsedDate.getTime())) {
-        throw new Error("Invalid date format");
-      }
-    } catch (error) {
-      return res.status(400).json({
+    // Find the quotation
+    const quotation = await Quotation.findById(id);
+    if (!quotation) {
+      return res.status(404).json({
         success: false,
-        error: "Invalid date format. Please use YYYY-MM-DD format.",
+        error: "Quotation not found",
       });
     }
 
-    // Recalculate the total price from items and sub-items
+    // Check authorization - admin or creator (using preparedBy)
+    if (
+      req.user.role !== "admin" &&
+      quotation.preparedBy.toString() !== req.user._id.toString() // Changed to preparedBy
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: "Not authorized to update this quotation",
+      });
+    }
+
+    // Recalculate prices
     const totalPrice = items.reduce((total, item) => {
       const itemTotal = item.quantity * item.price;
-      const subItemsTotal =
-        item.subItems && Array.isArray(item.subItems)
-          ? item.subItems.reduce(
-              (subTotal, subItem) =>
-                subTotal + subItem.quantity * subItem.price,
-              0
-            )
-          : 0;
+      const subItemsTotal = item.subItems.reduce(
+        (subTotal, subItem) => subTotal + subItem.quantity * subItem.price,
+        0
+      );
       return total + itemTotal + subItemsTotal;
     }, 0);
 
-    // Calculate VAT (15% of totalPrice, rounded up)
     const VATAmount = Math.ceil(totalPrice * 0.15);
-
-    // Calculate final amount (total price + VAT)
     const finalAmount = totalPrice + VATAmount;
 
-    // Format the date for display purposes (optional)
-    const formattedDate = parsedDate
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-      .replace(/\//g, " / ");
-
-    // Update the invoice with the recalculated amounts and provided details
-    const updatedInvoice = await Invoice.findByIdAndUpdate(
+    // Update the quotation
+    const updatedQuotation = await Quotation.findByIdAndUpdate(
       id,
       {
         companyName,
-        date: parsedDate, // Store as Date object
+        date,
         items,
-        invoiceNumber,
+        quotationNumber,
         terms,
         totalPrice,
         VATAmount,
         finalAmount,
+        preparedBy: req.user._id, // Keep the original preparedBy
       },
       { new: true, runValidators: true }
     );
 
-    if (!updatedInvoice) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Invoice not found" });
-    }
-
-    // Optionally add formattedDate to the response if needed for display
-    const responseData = {
-      ...updatedInvoice.toObject(),
-      formattedDate, // Include this if your frontend needs the formatted version
-    };
-
-    res.status(200).json({ success: true, data: responseData });
+    res.status(200).json({ success: true, data: updatedQuotation });
   } catch (error) {
-    console.error("Error updating invoice:", error);
+    console.error("Error updating Quotation:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
 export const getInvoiceById = async (req, res) => {
+  console.log("Fetching Quotation by ID:", req.params.id);
+  
   try {
-    const { id } = req.params;
+    const quotation = await Quotation.findById(req.params.id).populate(
+      "preparedBy",
+      "name email"
+    ); // Only populate preparedBy
 
-    // Find the invoice by ID
-    const invoice = await Invoice.findById(id);
-
-    // If invoice not found, return 404
-    if (!invoice) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Invoice not found" });
+    if (!quotation) {
+      return res.status(404).json({
+        success: false,
+        error: "Quotation not found",
+      });
     }
 
-    // Return the invoice
-    res.status(200).json({ success: true, data: invoice });
+    // Check access - admin or creator (using preparedBy)
+    if (
+      req.user.role !== "admin" &&
+      quotation.preparedBy._id.toString() !== req.user._id.toString() // Changed to preparedBy
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: "Not authorized to access this quotation",
+      });
+    }
+    console.log(quotation);
+    
+
+    res.status(200).json({ success: true, data: quotation });
   } catch (error) {
-    console.error("Error fetching invoice:", error);
+    console.error("Error fetching Quotation:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -884,16 +885,16 @@ export const generatePdfById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Fetch the invoice from the database
-    const invoice = await Invoice.findById(id);
-    if (!invoice) {
+    // Fetch the Quotation from the database
+    const quotation = await Quotation.findById(id);
+    if (!quotation) {
       return res
         .status(404)
-        .json({ success: false, error: "Invoice not found" });
+        .json({ success: false, error: "Quotation not found" });
     }
 
-    // Extract data from the invoice
-    const { companyName, date, items, invoiceNumber, terms } = invoice;
+    // Extract data from the Quotation
+    const { companyName, date, items, quotationNumber, terms } = quotation;
 
     // Format the date for display
     const formattedDate = new Date(date)
@@ -1187,7 +1188,7 @@ export const generatePdfById = async (req, res) => {
             </div>
             <p class="blue_font italic">
               <strong>No. </strong>
-              <span style="color: red; font-style: normal;letter-spacing:3px; font-weight:500;font-size:14px;">&nbsp;${invoiceNumber}</span>
+              <span style="color: red; font-style: normal;letter-spacing:3px; font-weight:500;font-size:14px;">&nbsp;${quotationNumber}</span>
             </p>
             <p class="pt-10" style="margin-bottom: 0">
               <span class="blue_font">Date:</span> <span style="color: black font-weight:400;font-size:14px"><i> ${formattedDate}</i></span>
