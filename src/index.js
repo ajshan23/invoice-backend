@@ -17,7 +17,7 @@ app.use(morgan("dev"));
 // Correct and more specific CORS configuration:
 app.use(
   cors({
-    origin: "http://chat.cmc-consultancy.com/", // adjust to your frontend port
+    origin: "https://one.igniteway.in/", // adjust to your frontend port
     methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Optional if you're sending cookies
