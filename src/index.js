@@ -13,11 +13,11 @@ dotenv.config();
 const app = express();
 const PORT = 3005;
 app.use(helmet());
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 // Correct and more specific CORS configuration:
 app.use(
   cors({
-    origin: "http://localhost:5173", // adjust to your frontend port
+    origin: "http://chat.cmc-consultancy.com/", // adjust to your frontend port
     methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Optional if you're sending cookies
